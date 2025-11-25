@@ -27,7 +27,7 @@ def grad_U(x: np.ndarray, f: Callable, grad_f: Callable) -> float:
     Returns:
         float: Gradient of the potential energy
     """
-    return -1 * (grad_f(x) / f(x))
+    return grad_f(x) / f(x)
 
 
 def kinetic_energy(M: np.ndarray, p: np.ndarray) -> float:
@@ -118,11 +118,18 @@ def leapfrog(
 
 
 def hamiltonian_sample(
-    f: Callable, grad_f: Callable, num_samples: int, L: int = 100, step_size: int = 1
+    x: np.ndarray,
+    f: Callable,
+    grad_f: Callable,
+    num_samples: int,
+    L: int = 100,
+    step_size: int = 1,
+    mass=1,
 ) -> np.ndarray:
     """Sample points using hamiltonian-montecarlo
 
     Args:
+        x: Initial point
         f: Function you want to sample from
         grad_f: Gradient of the function you want to sample from
         num_samples: Number of samples to generate
@@ -133,11 +140,11 @@ def hamiltonian_sample(
         np.ndarray: Array of the sampled points
     """
 
-    M = np.eye(2)  # initial value of mass matrix (symmetric and positive definite)
-    x = np.array([0.1, 0.1])  # initial value (must be same dimension as f input)
-    p = np.random.multivariate_normal(
-        mean=np.zeros(2), cov=M
-    )  # initial value (sample random momentum)
+    M = mass * np.eye(2)  # initial value of mass matrix
+    # p = np.random.multivariate_normal(
+    #     mean=np.zeros(2), cov=M
+    # )  # initial value (sample random momentum)
+    p = np.zeros(2)
 
     samples = np.empty((0, 2))
 
