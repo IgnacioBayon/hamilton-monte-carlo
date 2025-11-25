@@ -111,7 +111,7 @@ def leapfrog(
 
     for t in range(L):
         p_halfstep = p - (step_size / 2) * grad_U(x, f, grad_f)
-        x_new = x + step_size * np.linalg.inv(M) * p_halfstep
+        x_new = x + step_size * np.linalg.inv(M).dot(p_halfstep)
         p_new = p_halfstep - (step_size / 2) * grad_U(x, f, grad_f)
 
     return x_new, p_new
@@ -134,8 +134,10 @@ def hamiltonian_sample(
     """
 
     M = np.eye(2)  # initial value of mass matrix (symmetric and positive definite)
-    x = np.ndarray([1, 2])  # initial value (must be same dimension as f input)
-    p = np.random.normal(0, M)  # initial value (sample random momentum)
+    x = np.array([0.1, 0.1])  # initial value (must be same dimension as f input)
+    p = np.random.multivariate_normal(
+        mean=np.zeros(2), cov=M
+    )  # initial value (sample random momentum)
 
     samples = np.empty((0, 2))
 
