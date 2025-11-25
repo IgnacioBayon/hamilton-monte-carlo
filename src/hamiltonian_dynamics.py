@@ -104,10 +104,8 @@ def leapfrog(
     p_new = x.copy()
 
     for t in range(L):
-        p_halfstep = p[t] - (step_size / 2) * grad_U(
-            x,
-        )
+        p_halfstep = p[t] - (step_size / 2) * grad_U(x, f, grad_f)
         x_new = x[t] + step_size * np.linalg.inv(M) * p_halfstep
-        p_new = p_halfstep - (step_size / 2) * grad_U(x)
+        p_new = p_halfstep - (step_size / 2) * grad_U(x, f, grad_f)
 
     return x_new, p_new
