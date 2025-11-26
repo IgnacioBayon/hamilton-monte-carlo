@@ -205,3 +205,34 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# ---- LaTeX build files ----
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.xdv
+*.run.xml
+*.bcf
+
+# If using minted
+_latexmk/
+*.pyg
+
+# Ignore intermediate build directories
+build/
+latex.out/
+
+# Ignore PDF file
+*.pdf
