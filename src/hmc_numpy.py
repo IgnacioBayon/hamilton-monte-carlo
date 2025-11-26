@@ -27,7 +27,7 @@ def grad_U(x: np.ndarray, f: Callable, grad_f: Callable) -> float:
     Returns:
         float: Gradient of the potential energy
     """
-    return grad_f(x) / f(x)
+    return -(grad_f(x) / f(x))
 
 
 def kinetic_energy(M: np.ndarray, p: np.ndarray) -> float:
@@ -148,6 +148,8 @@ def hamiltonian_sample(
 
     samples = np.empty((0, 2))
 
+    num_rejected = 0
+
     for i in range(num_samples):
         x_new, p_new = leapfrog(x, p, M, L, step_size, f, grad_f)
 
@@ -159,6 +161,8 @@ def hamiltonian_sample(
             x = x_new
             p = p_new
         else:
+            num_rejected += 1
             samples = np.vstack([samples, x])
 
+    print(f"Number of rejected samples: {num_rejected}")
     return samples
