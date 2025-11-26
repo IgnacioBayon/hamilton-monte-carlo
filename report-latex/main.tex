@@ -1,0 +1,96 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+%------------------------------------------------------------
+%This block of code defines the information to appear in the
+%Title page
+\title[HMC]
+{Hamiltonian Monte Carlo}
+
+\subtitle{Bachelor's Thesis}
+
+\author[Autores]{%
+  Ignacio Bayón Jimenez-Ugarte\inst{1} \\
+  Sergio Herreros Pérez\inst{1} \\
+  Adrián López-Lanchares Echezarreta\inst{1} \\
+}
+
+\institute[ICAI] % (optional)
+{
+  \inst{1}%
+  Universidad Pontificia Comillas, ICAI
+}
+
+\date[08/29/2025] % (optional)
+{08/29/2025}
+
+\logo{\includegraphics[height=1cm]{images/Logo_Comillas}}
+
+%End of title page configuration block
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%------------------------------------------------------------
+
+
+\begin{document}
+
+% ---------- Title ----------
+\begin{frame}
+  % chktex 1
+  \titlepage
+\end{frame}
+
+
+% ===================== STATE OF THE ART =====================
+\section{State of the Art}
+
+% ---- Current Approaches + Limitations ----
+\begin{frame}{Current Approaches in DMTA}
+\begin{itemize}
+    \item Standard workflow in the field:
+    \begin{itemize}
+        \item Statistical tests: ANOVA, Kruskal-Wallis $+$ post-hoc comparisons
+        \item PCA for exploratory visualization
+    \end{itemize}
+    \item These techniques have been applied \textbf{for years without major updates}.
+    \item More advanced methods (advanced Statistics, Machine Learning) are rarely used:
+    \begin{itemize}
+        \item Data are \textbf{small, noisy, multicollinear} $\Rightarrow$ challenging
+        \item Researchers rely on familiar statistics
+    \end{itemize}
+\end{itemize}
+
+\begin{block}{Key message}
+Applying and validating \textbf{modern probabilistic models} on such a complex, reduced dataset
+is itself a significant contribution.
+\end{block}
+\end{frame}
+
+
+% ---- Final Thank You ----
+\begin{frame}
+\centering
+\Large \textbf{Thank you for your attention!}\\[8pt]
+\normalsize Questions?
+\end{frame}
+
+
+
+\end{document}
