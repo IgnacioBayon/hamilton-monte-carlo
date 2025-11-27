@@ -216,7 +216,7 @@ __marimo__/
 *.fls
 *.log
 *.out
-*.synctex.gz
+*.synctex*
 *.toc
 *.lof
 *.lot

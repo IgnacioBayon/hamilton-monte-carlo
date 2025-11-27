@@ -11,22 +11,19 @@
 \title[HMC]
 {Hamiltonian Monte Carlo}
 
-\subtitle{Bachelor's Thesis}
+\subtitle{MSc in AI --- Probabilistic Methods}
 
-\author[Autores]{%
-  Ignacio Bayón Jimenez-Ugarte\inst{1} \\
-  Sergio Herreros Pérez\inst{1} \\
-  Adrián López-Lanchares Echezarreta\inst{1} \\
+\author[PM]{%
+  \texorpdfstring{
+    Ignacio Bayón Jimenez-Ugarte\newline
+    Sergio Herreros Pérez\newline
+    Adrián López-Lanchares Echezarreta  
+  }{Ignacio Bayón Jimenez-Ugarte, Sergio Herreros Pérez, Adrián López-Lanchares Echezarreta}
 }
 
-\institute[ICAI] % (optional)
-{
-  \inst{1}%
-  Universidad Pontificia Comillas, ICAI
-}
+\institute[ICAI]{Universidad Pontificia Comillas, ICAI}
 
-\date[08/29/2025] % (optional)
-{08/29/2025}
+\date[08/29/2025]{08/29/2025}
 
 \logo{\includegraphics[height=1cm]{images/Logo_Comillas}}
 
@@ -52,43 +49,319 @@
 \begin{document}
 
 % ---------- Title ----------
-\begin{frame}
-  % chktex 1
-  \titlepage
+\begin{frame}\titlepage\end{frame}
+
+
+% ===================== BODY =====================
+\section{Motivation and Background}
+
+
+\subsection{The Sampling Problem}
+
+\begin{frame}{The Sampling Problem}
+  
+  \textbf{Goal:} draw samples from a target posterior distribution
+  \[
+    p(\theta \mid \text{data})
+    = \frac{p(\text{data} \mid \theta)\, p(\theta)}{Z},
+    \quad
+    Z = \int p(\text{data} \mid \theta)\, p(\theta)\, d\theta.
+  \]
+  
+  \vspace{0.3cm}
+  
+  \textbf{Issue:} the normalising constant $Z$ is often intractable.
+  
+  \vspace{0.3cm}
+  
+  \textbf{Workaround in MCMC:}
+  \begin{itemize}
+    \item We only need the unnormalised density
+          \[
+            \tilde{\pi}(\theta)
+            = p(\text{data} \mid \theta)\, p(\theta)
+            \propto p(\theta \mid \text{data}).
+          \]
+    \item MCMC algorithms use ratios such as
+          \(
+          \tilde{\pi}(\theta') / \tilde{\pi}(\theta)
+          \),
+          where $Z$ cancels out.
+  \end{itemize}
+  
+  \vspace{0.2cm}
+  
+  \textbf{Conclusion:} We can sample from the posterior using only the
+  \emph{unnormalised} density $\tilde{\pi}(\theta)$.
 \end{frame}
 
 
-% ===================== STATE OF THE ART =====================
-\section{State of the Art}
+\subsection{The Metropolis-Hastings Algorithm}
 
-% ---- Current Approaches + Limitations ----
-\begin{frame}{Current Approaches in DMTA}
+\begin{frame}{The Metropolis-Hastings Algorithm}
+  
+  \textbf{Goal:} construct a Markov chain whose stationary distribution is the
+  target posterior $\pi(\theta)$ (known up to a normalising constant).
+  
+  \vspace{0.2cm}
+  
+  \textbf{Algorithm (one iteration):}
+  \begin{enumerate}
+    \item At current state $\theta$, draw a proposal
+          \[
+            \theta' \sim q(\theta' \mid \theta) \quad (q\text{: proposal distribution}).
+          \]
+    \item Compute the acceptance probability
+          \[
+            \alpha =
+            \min\left(
+            1,\;
+            \frac{\tilde{\pi}(\theta')\, q(\theta \mid \theta')}
+              {\tilde{\pi}(\theta)\, q(\theta' \mid \theta)}
+            \right).
+          \]
+    \item With probability $\alpha$, move to $\theta'$;
+          otherwise, stay at $\theta$.
+  \end{enumerate}
+  
+  \vspace{0.2cm}
+  
+  \textbf{Key properties:}
+  \begin{itemize}
+    \item Ensures $\pi(\theta)$ is the stationary distribution.
+    \item Works with the \emph{unnormalised} density $\tilde{\pi}(\theta)$.
+    \item Very general: any proposal $q$ is allowed (almost).
+  \end{itemize}
+  
+\end{frame}
+
+
+\subsection{Limitations of Metropolis-Hastings}
+
+\begin{frame}{Limitations of Metropolis-Hastings}
+  
+  \textbf{Random-walk proposals:}
+  \[
+    \theta' = \theta + \epsilon,
+    \qquad \epsilon \sim \mathcal{N}(0, \sigma^2 I).
+  \]
+  
+  \textbf{Problems:}
+  \begin{itemize}
+    \item Moves are local and uninformed.
+    \item Slow exploration of the parameter space.
+    \item High autocorrelation between samples.
+    \item Very low acceptance rates for larger moves.
+  \end{itemize}
+  
+  \vspace{0.2cm}
+  
+  \textbf{Result:} MH becomes inefficient in high dimensions or
+  for correlated posteriors.
+\end{frame}
+
+
+
+\section{Hamiltonian Dynamics}
+
+
+\subsection{Introduction to Hamiltonian Dynamics}
+
+\begin{frame}{Introduction to Hamiltonian Dynamics}
+  
+  \textbf{Idea:} Use physics to propose efficient moves in the parameter space.
+  
+  \begin{itemize}
+    \item Treat parameters as a \textbf{position} vector $q$.
+    \item Introduce an auxiliary \textbf{momentum} variable $p$.
+    \item Define a \textbf{total energy} (Hamiltonian)
+          \[
+            H(q,p) = U(q) + K(p).
+          \]
+    \item The particle moves through the energy landscape following
+          smooth, long-range trajectories.
+  \end{itemize}
+  
+  \vspace{0.2cm}
+  
+  \textbf{Why this helps:} proposals follow the geometry of the target
+  distribution, reducing random-walk behaviour.
+\end{frame}
+
+
+\subsection{Potential and Kinetic Energy}
+
+\begin{frame}{Potential and Kinetic Energy}
+  
+  \textbf{Potential energy:}
+  \[
+    U(q) = -\log \tilde{\pi}(q),
+  \]
+  where $\tilde{\pi}(q)$ is the unnormalised target density.
+  
+  \begin{itemize}
+    \item High-probability regions $\Rightarrow$ low potential energy.
+    \item The energy landscape encodes the geometry of the posterior.
+  \end{itemize}
+  
+  \vspace{0.3cm}
+  
+  \textbf{Kinetic energy:}
+  \[
+    K(p) = \tfrac{1}{2} p^\top M^{-1} p,
+    \qquad p \sim \mathcal{N}(0, M).
+  \]
+  
+  \begin{itemize}
+    \item Introduces momentum to help the sampler move through $q$-space.
+    \item Mass matrix $M$ controls scaling and correlations.
+  \end{itemize}
+  
+  \vspace{0.3cm}
+  
+  \textbf{Hamiltonian:} \quad $H(q,p) = U(q) + K(p)$.
+\end{frame}
+
+
+\subsection{Hamilton's Equations}
+
+\begin{frame}{Hamilton's Equations}
+  
+  Given $H(q,p) = U(q) + K(p)$, the dynamics are defined by:
+  
+  \[
+    \frac{dq}{dt} = \frac{\partial H}{\partial p},
+    \qquad
+    \frac{dp}{dt} = -\frac{\partial H}{\partial q}.
+  \]
+  
+  \vspace{0.4cm}
+  
+  \textbf{Interpretation:}
+  \begin{itemize}
+    \item $q$ evolves according to the momentum.
+    \item $p$ evolves according to the gradient of the potential.
+    \item Total energy $H$ is approximately conserved.
+  \end{itemize}
+  
+  \vspace{0.2cm}
+  
+  These trajectories form the basis of efficient proposals in HMC
+\end{frame}
+
+
+
+\section{Hamiltonian Monte Carlo}
+
+
+\subsection{Leapfrog Integrator}
+
+\begin{frame}{The Leapfrog Integrator}
+  
+  \textbf{Goal:} simulate Hamilton's equations numerically while preserving
+  the key geometric properties of the dynamics.
+  
+  \vspace{0.15cm}
+  
+  \textbf{Given step size $\varepsilon$, one leapfrog step:}
+  \begin{align*}
+    p & \leftarrow p - \frac{\varepsilon}{2}\,\nabla U(q) 
+      &                                                     & \text{(half momentum update)} \\
+    q & \leftarrow q + \varepsilon\, M^{-1} p           
+      &                                                     & \text{(full position update)} \\
+    p & \leftarrow p - \frac{\varepsilon}{2}\,\nabla U(q) 
+      &                                                     & \text{(half momentum update)}
+  \end{align*}
+  
+  \vspace{0.15cm}
+  
+  \textbf{Why leapfrog?}
+  \begin{itemize}
+    \item \textbf{Reversible:} can run forwards or backwards.
+    \item \textbf{Volume-preserving:} Jacobian determinant = 1.
+    \item \textbf{Nearly energy-conserving:} for moderate step sizes.
+  \end{itemize}
+  
+  \vspace{0.2cm}
+  
+  \textbf{Result:} long, stable trajectories = high-acceptance proposals.
+\end{frame}
+
+
+\subsection{The HMC Algorithm}
+
+\begin{frame}{The HMC Algorithm}
+  
+  \textbf{Goal:} propose distant states with high acceptance using
+  Hamiltonian trajectories.
+  
+  \vspace{0.3cm}
+  
+  \textbf{One HMC iteration:}
+  \begin{enumerate}
+    \item \textbf{Sample momentum}
+          \[
+            p \sim \mathcal{N}(0, M).
+          \]
+          
+    \item \textbf{Simulate a trajectory}
+          Run $L$ leapfrog steps with step size $\varepsilon$ to obtain
+          $(q^*, p^*)$ from the initial $(q, p)$.
+          
+    \item \textbf{Metropolis acceptance step}
+          \[
+            \alpha = \min\left(1,\;
+            \exp\left[-H(q^*, p^*) + H(q, p)\right]\right).
+          \]
+          Accept $q^*$ with probability $\alpha$, else keep $q$.
+  \end{enumerate}
+  
+  \vspace{0.2cm}
+  
+  \textbf{Key idea:} leapfrog produces proposals with
+  \emph{almost-conserved energy}, so acceptance rates are high.
+  \vspace{1cm}
+
+\end{frame}
+
+
+\subsection{Why HMC Works Well}
+
+\begin{frame}{Why HMC Works Well}
+
+\textbf{Key advantages:}
 \begin{itemize}
-    \item Standard workflow in the field:
-    \begin{itemize}
-        \item Statistical tests: ANOVA, Kruskal-Wallis $+$ post-hoc comparisons
-        \item PCA for exploratory visualization
-    \end{itemize}
-    \item These techniques have been applied \textbf{for years without major updates}.
-    \item More advanced methods (advanced Statistics, Machine Learning) are rarely used:
-    \begin{itemize}
-        \item Data are \textbf{small, noisy, multicollinear} $\Rightarrow$ challenging
-        \item Researchers rely on familiar statistics
-    \end{itemize}
+    \item \textbf{Informed proposals:} trajectories follow the gradient of
+          $\log \tilde{\pi}(q)$, not a random walk.
+    \item \textbf{Long-distance moves:} leapfrog integration produces
+          coherent paths through the parameter space.
+    \item \textbf{High acceptance rates:} energy is almost conserved,
+          so Metropolis rejections are rare.
+    \item \textbf{Low autocorrelation:} successive samples are less dependent,
+          improving effective sample size.
+    \item \textbf{Scales better with dimension:} less sensitivity to the curse
+          of dimensionality than random-walk MH
 \end{itemize}
 
-\begin{block}{Key message}
-Applying and validating \textbf{modern probabilistic models} on such a complex, reduced dataset
-is itself a significant contribution.
-\end{block}
+\vspace{0.2cm}
+
+\textbf{Result:} HMC explores complex posteriors much more efficiently
+than standard Metropolis-Hastings.
 \end{frame}
+
+
+\section{Experiments}
+\subsection{Subsection A}
+\subsection{Subsection B}
+\subsection{Subsection C}
+% ================================================
 
 
 % ---- Final Thank You ----
 \begin{frame}
-\centering
-\Large \textbf{Thank you for your attention!}\\[8pt]
-\normalsize Questions?
+  \centering
+  \Large \textbf{Thank you for your attention!}\\[8pt]
+  \normalsize Questions?
 \end{frame}
 
 
