@@ -3,42 +3,50 @@ import numpy as np
 from typing import Callable
 
 
-def log_prob_mixture(
-    x: np.ndarray,
-    weights: np.ndarray,
-    means: np.ndarray,
-    covariances: np.ndarray,
-) -> float:
-    """Unnormalised log density log f(x) for a N-component 2D Gaussian mixture
+class CustomGaussian:
+    def __init__(
+        self,
+        weights: np.ndarray,
+        means: np.ndarray,
+        covariances: np.ndarray,
+    ):
+        self.weights = weights
+        self.means = means
+        self.covariances = covariances
 
-    Args:
-        x (np.ndarray): Input 2D point
+    def log_prob_mixture(
+        self,
+        x: np.ndarray,
+    ) -> float:
+        """Unnormalised log density log f(x) for a N-component 2D Gaussian mixture
 
-    Returns:
-        float: Unnormalised log density log f(x)
-    """
-    x = np.asarray(x)
-    d = 2
+        Args:
+            x (np.ndarray): Input 2D point
 
-    log_weights = np.log(weights)
-    log_two_pi = np.log(2 * np.pi)
-    log_pdfs = []
+        Returns:
+            float: Unnormalised log density log f(x)
+        """
+        x = np.asarray(x)
+        d = 2
 
-    K = len(weights)
+        log_weights = np.log(self.weights)
+        log_two_pi = np.log(2 * np.pi)
+        log_pdfs = []
 
-    for k in range(K):
-        diff = x - means[k]
-        inv_cov = np.linalg.inv(covariances[k])
-        log_det = np.log(np.linalg.det(covariances[k]))
-        quad = diff.T @ inv_cov @ diff
-        log_pdf = -0.5 * (d * log_two_pi + log_det + quad)
-        log_pdfs.append(log_pdf)
+        K = len(self.weights)
+        for k in range(K):
+            diff = x - self.means[k]
+            inv_cov = np.linalg.inv(self.covariances[k])
+            log_det = np.log(np.linalg.det(self.covariances[k]))
+            quad = diff.T @ inv_cov @ diff
+            log_pdf = -0.5 * (d * log_two_pi + log_det + quad)
+            log_pdfs.append(log_pdf)
 
-    log_pdfs = np.array(log_pdfs)
-    max_log = np.max(log_weights + log_pdfs)
-    log_sum_exp = max_log + np.log(np.sum(np.exp(log_weights + log_pdfs - max_log)))
+        log_pdfs = np.array(log_pdfs)
+        max_log = np.max(log_weights + log_pdfs)
+        log_sum_exp = max_log + np.log(np.sum(np.exp(log_weights + log_pdfs - max_log)))
 
-    return log_sum_exp
+        return log_sum_exp
 
 
 def grad_log_prob_mixture(
