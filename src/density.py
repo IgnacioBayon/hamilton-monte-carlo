@@ -21,10 +21,16 @@ class CustomGaussian(Density):
         weights: np.ndarray,
         means: np.ndarray,
         covariances: np.ndarray,
+        grad_weights: np.ndarray = None,
+        grad_means: np.ndarray = None,
+        grad_covariances: np.ndarray = None,
     ):
         self.weights = weights
         self.means = means
         self.covariances = covariances
+        self.grad_weights = grad_weights
+        self.grad_means = grad_means
+        self.grad_covariances = grad_covariances
 
     def U(
         self,
@@ -73,19 +79,19 @@ class CustomGaussian(Density):
         x = np.asarray(x)
         d = 2
 
-        log_weights = np.log(self.weights)
+        log_weights = np.log(self.grad_weights)
         log_two_pi = np.log(2 * np.pi)
 
-        log_pdfs = np.empty(len(self.weights))
+        log_pdfs = np.empty(len(self.grad_weights))
         inv_covs = []
 
         K = len(self.weights)
 
         for k in range(K):
-            diff = x - self.means[k]
-            inv_cov = np.linalg.inv(self.covariances[k])
+            diff = x - self.grad_means[k]
+            inv_cov = np.linalg.inv(self.grad_covariances[k])
             inv_covs.append(inv_cov)
-            log_det = np.log(np.linalg.det(self.covariances[k]))
+            log_det = np.log(np.linalg.det(self.grad_covariances[k]))
             quad = diff.T @ inv_cov @ diff
             log_pdf = -0.5 * (d * log_two_pi + log_det + quad)
             log_pdfs[k] = log_pdf
@@ -98,7 +104,7 @@ class CustomGaussian(Density):
         grad = np.zeros_like(x, dtype=float)
 
         for k in range(K):
-            grad += r[k] * (inv_covs[k] @ (self.means[k] - x))
+            grad += r[k] * (inv_covs[k] @ (self.grad_means[k] - x))
 
         return -grad
 

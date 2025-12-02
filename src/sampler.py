@@ -101,3 +101,42 @@ class HMCSampler:
             samples[i] = x
 
         return samples, accepted / n_samples
+
+
+class MetropolisHastingsSampler:
+    def __init__(self, density: Density):
+        self.U = density.U
+
+    def sample(self, n_samples, proposal_scale, dim, initial_q):
+        """
+        Random-walk Metropolis sampler for baseline comparison.
+
+        log_prob: function returning unnormalised log density
+        n_samples: number of samples
+        proposal_scale: standard deviation of Gaussian proposal
+        dim: dimension of the state space
+        initial_q: initial position, shape (dim,)
+
+        Returns:
+            samples of shape (n_samples, dim)
+        """
+        samples = np.zeros((n_samples, dim))
+        accepted = 0
+        q = np.asarray(initial_q, dtype=float).copy()
+
+        for i in range(n_samples):
+            # Gaussian random-walk proposal
+            q_prop = q + proposal_scale * np.random.normal(size=dim)
+
+            current_logp = -self.U(q)  # since U = -log p
+            proposed_logp = -self.U(q_prop)
+
+            log_accept_ratio = proposed_logp - current_logp
+
+            if np.log(np.random.rand()) < log_accept_ratio:
+                q = q_prop
+                accepted += 1
+
+            samples[i] = q
+
+        return samples, accepted / n_samples
