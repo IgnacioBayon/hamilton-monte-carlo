@@ -2,6 +2,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{booktabs}
 
+% \setbeameroption{show notes}
+
 \usetheme{Madrid}
 \usecolortheme{default}
 
@@ -93,6 +95,10 @@
   
   \textbf{Conclusion:} We can sample from the posterior using only the
   \emph{unnormalised} density $\tilde{\pi}(\theta)$.
+  
+  \note{
+    En muchos problemas bayesianos no podemos calcular la constante de normalización de la distribución posterior, lo que impide muestrear directamente de ella. Los métodos MCMC resuelven esto trabajando solo con la densidad no normalizada, aprovechando que los cocientes de densidades eliminan la constante intractable. Así, el reto no es la evaluación de la posterior, sino cómo explorar eficazmente el espacio de parámetros.
+  }
 \end{frame}
 
 
@@ -133,6 +139,9 @@
     \item Very general: any proposal $q$ is allowed (almost).
   \end{itemize}
   
+  \note{
+    Metropolis-Hastings construye una cadena de Markov que converge a la distribución objetivo mediante propuestas locales y una regla de aceptación basada en densidades no normalizadas. Su fortaleza es la generalidad: cualquier propuesta válida permite muestrear correctamente. Sin embargo, su rendimiento depende críticamente de cómo de bien esas propuestas exploran el espacio, lo que conduce directamente a sus limitaciones.
+  }
 \end{frame}
 
 
@@ -159,6 +168,10 @@
   
   \textbf{Result:} MH becomes inefficient in high dimensions or
   for correlated posteriors.
+  
+  \note{
+    Las propuestas aleatorias (random walk) avanzan sin información geométrica, lo que provoca movimientos extremadamente locales, elevada autocorrelación y una exploración muy lenta, especialmente en dimensiones altas o distribuciones alargadas. Como consecuencia, el algoritmo necesita muchos más pasos para producir muestras útiles y su tasa de aceptación cae rápidamente cuando intentamos dar saltos más largos.
+  }
 \end{frame}
 
 
@@ -187,6 +200,10 @@
   
   \textbf{Why this helps:} proposals follow the geometry of the target
   distribution, reducing random-walk behaviour.
+  
+  \note{
+    Para superar las limitaciones del random walk, modelamos la exploración como el movimiento de una partícula en un paisaje de energía: los parámetros son la posición, añadimos un momento artificial y definimos un Hamiltoniano que combina energía potencial y cinética. Las trayectorias resultantes son suaves y de largo alcance, lo que permite recorrer regiones de alta probabilidad sin el comportamiento errático típico de Metropolis-Hastings.
+  }
 \end{frame}
 
 
@@ -221,6 +238,10 @@
   \vspace{0.3cm}
   
   \textbf{Hamiltonian:} \quad $H(q,p) = U(q) + K(p)$.
+  
+  \note{
+    La energía potencial se corresponde con el -logaritmo de la densidad objetivo no normalizada, por lo que las zonas más probables son “valles” del paisaje. La energía cinética proviene del momento, que introducimos de manera artificial para impulsar el movimiento. El uso de una matriz de masa permite adaptar la escala y correlaciones, capturando mejor la geometría de la distribución. La suma de ambas define el Hamiltoniano que determina la dinámica.
+  }
 \end{frame}
 
 
@@ -248,6 +269,10 @@
   \vspace{0.2cm}
   
   These trajectories form the basis of efficient proposals in HMC
+  
+  \note{
+    Las ecuaciones de Hamilton describen cómo evoluciona el sistema: la posición cambia según el momento, y el momento cambia según el gradiente del potencial. Estas ecuaciones conservan la energía total y generan trayectorias que se ajustan al relieve de la distribución. En HMC, estas trayectorias se utilizan para proponer movimientos que son largos y coherentes y que tienen probabilidad alta de ser aceptados.
+  }
 \end{frame}
 
 
@@ -286,6 +311,10 @@
   \vspace{0.2cm}
   
   \textbf{Result:} long, stable trajectories = high-acceptance proposals.
+  
+  \note{
+    Como no podemos resolver analíticamente las ecuaciones de Hamilton, utilizamos el integrador leapfrog, que alterna actualizaciones del momento y la posición. Este integrador es especial porque preserva volumen, es reversible y mantiene aproximadamente constante la energía, propiedades esenciales para que las propuestas sean válidas dentro del marco MCMC y para que la aceptación sea alta.
+  }
 \end{frame}
 
 
@@ -323,6 +352,9 @@
   \emph{almost-conserved energy}, so acceptance rates are high.
   \vspace{1cm}
   
+  \note{
+    Un paso de HMC consiste en muestrear un momento nuevo, simular la dinámica con leapfrog durante varios pasos y luego aplicar una corrección Metropolis basada en el cambio de energía. Como la energía apenas varía durante la trayectoria, la probabilidad de aceptar el nuevo punto es muy elevada, lo que permite movimientos largos y naturales.
+  }
 \end{frame}
 
 
@@ -347,6 +379,10 @@
   
   \textbf{Result:} HMC explores complex posteriors much more efficiently
   than standard Metropolis-Hastings.
+  
+  \note{
+    HMC utiliza el gradiente de la densidad para desplazarse de forma informada y evitar el comportamiento de random walk. Esto se traduce en baja autocorrelación, mayor independencia entre muestras y tasas de aceptación muy superiores. Además, estas propiedades escalan mucho mejor a dimensiones más altas, haciendo que HMC sea particularmente eficaz donde Metropolis-Hastings es cada vez peor.
+  }
 \end{frame}
 
 
@@ -356,9 +392,14 @@
 
 \subsection{Sampling from Gaussian Mixtures}
 
-\begin{frame}{HMC Trajectories in a Gaussian Mixture}
+\begin{frame}{HMC Trajectories in a Gaussian Mixture Model}
   \centering
   \includegraphics[width=0.6\textwidth]{../images/hmc-trajectories.png}
+  
+  \note{
+    En mezclas de Gaussianas, las trayectorias de HMC siguen curvas amplias que conectan regiones de alta densidad sin quedar atrapadas en un único modo. Las visualizaciones muestran cómo el sampler aprovecha la estructura del paisaje para moverse de manera natural entre componentes. 
+  }
+  
 \end{frame}
 
 \begin{frame}{HMC vs Metropolis-Hastings: Sample Comparison}
@@ -374,8 +415,12 @@
       \small\textbf{Metropolis Hastings}
     \end{column}
   \end{columns}
-
+  
   \vspace{0.5cm}
+  \note{
+    La comparación de muestras revela claramente que HMC se distribuyé correctamente entre los modos. En contraste, MH tiende a concentrarse en una sola región y explora de forma mucho más limitada. En aplicaciones donde buscamos obtener muestras plausibles y bien dispersas con pocos pasos (más que reconstruir la distribución completa) HMC es mucho mejor opción.
+  }
+  
 \end{frame}
 
 \begin{frame}{MMD$^2$ Comparison}
@@ -414,6 +459,9 @@
     \end{itemize}
   \end{minipage}
   
+  \note{
+    El análisis mediante MMD\^2 muestra que HMC alcanza rápidamente una distancia mínima respecto a la distribución real, mientras que MH requiere muchos más pasos para acercarse. Esto confirma que, cuando el objetivo práctico es generar buenas muestras en pocas iteraciones, HMC ofrece resultados de mucha mayor calidad sin requerir una cadena larga.
+  }
 \end{frame}
 
 
@@ -432,8 +480,12 @@
       \small\textbf{Metropolis Hastings}
     \end{column}
   \end{columns}
-
+  
   \vspace{0.5cm}
+  
+  \note{
+    El embudo de Neal es un ejemplo típico donde MH falla debido a la fuerte dependencia entre dimensiones y la geometría estrecha del embudo. HMC, en cambio, sigue las trayectorias inducidas por el gradiente y es capaz de atravesar la estructura de la distribución con mucha mayor estabilidad, produciendo muestras representativas incluso en las zonas de mayor dificultad geométrica.
+  }
 \end{frame}
 
 \begin{frame}{MMD$^2$ Comparison}
@@ -459,6 +511,10 @@
     \end{itemize}
   \end{minipage}
   
+  \note{
+    En dimensiones elevadas, los resultados son más claros: HMC mantiene una tasa de aceptación cercana al 100\% y su MMD\^2 cae rápidamente, mientras que MH sufre la maldición de la dimensionalidad y muestra unaa menos aceptación y calidad de muestreo. Esto demuestra que HMC no solo es más rápido, sino también más robusto cuando la complejidad aumenta.
+  }
+  
 \end{frame}
 
 
@@ -467,6 +523,12 @@
   \centering
   \Large \textbf{Thank you for your attention!}\\[8pt]
   \normalsize Questions?
+  
+  \vspace{2.5cm}
+  
+  Code:
+  
+  \url{https://github.com/IgnacioBayon/hamilton-monte-carlo}
 \end{frame}
 
 
