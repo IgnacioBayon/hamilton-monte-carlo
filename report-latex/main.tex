@@ -356,6 +356,28 @@
 
 \subsection{Sampling from Gaussian Mixtures}
 
+\begin{frame}{HMC Trajectories in a Gaussian Mixture}
+  \centering
+  \includegraphics[width=0.6\textwidth]{../images/hmc-trajectories.png}
+\end{frame}
+
+\begin{frame}{HMC vs Metropolis-Hastings: Sample Comparison}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{../images/hmc-samples.png}\\[4pt]
+      \small\textbf{Hamiltonian Monte Carlo}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{../images/metropolis-samples.png}\\[4pt]
+      \small\textbf{Metropolis Hastings}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.5cm}
+\end{frame}
+
 \begin{frame}{MMD$^2$ Comparison}
   
   % --- TOP ROW ---
@@ -397,7 +419,56 @@
 
 \subsection{Sampling from Neal's Funnel}
 
-% ================================================
+\begin{frame}{HMC vs Metropolis-Hastings: Sample Comparison}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{../images/nf-hmc-samples.png}\\[4pt]
+      \small\textbf{Hamiltonian Monte Carlo}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{../images/nf-metropolis-samples.png}\\[4pt]
+      \small\textbf{Metropolis Hastings}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.5cm}
+\end{frame}
+
+\begin{frame}{MMD$^2$ Comparison}
+  
+  % --- TOP ROW ---
+  \begin{columns}[T]
+    
+    % LEFT: Plot
+    \begin{column}{\textwidth}
+      \centering
+      \includegraphics[width=0.8\textwidth]{../images/nf-mmd2-full-comparison.png}
+    \end{column}
+    
+    % % RIGHT: First two bullet points
+    % \begin{column}{0.43\textwidth}
+    %   \textbf{Key observations:}
+    %   \begin{itemize}
+    %     \item \textbf{HMC remains stable at high dimensions}
+    %     \item \textbf{HMC accepts many more proposed points}
+    %   \end{itemize}
+    % \end{column}
+    
+  \end{columns}
+  
+  \vspace{0.25cm}
+  
+  % --- BOTTOM FULL-WIDTH ROW ---
+  \begin{minipage}{0.95\textwidth}
+    \begin{itemize}
+      \item \textbf{Practical implication:} Hamiltonian Monte Carlo sampling can be much more effective in high-dimensional distributions.
+      \item \textbf{Result:} HMC bypasses the curse of dimensionality and its acceptance rarte is much higher, making it a faster sampling algorithm.
+    \end{itemize}
+  \end{minipage}
+  
+\end{frame}
 
 
 % ---- Final Thank You ----
