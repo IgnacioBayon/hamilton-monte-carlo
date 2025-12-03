@@ -152,6 +152,7 @@
     \item Slow exploration of the parameter space.
     \item High autocorrelation between samples.
     \item Very low acceptance rates for larger moves.
+    \item Curse of dimensionality.
   \end{itemize}
   
   \vspace{0.2cm}
@@ -321,39 +322,81 @@
   \textbf{Key idea:} leapfrog produces proposals with
   \emph{almost-conserved energy}, so acceptance rates are high.
   \vspace{1cm}
-
+  
 \end{frame}
 
 
 \subsection{Why HMC Works Well}
 
 \begin{frame}{Why HMC Works Well}
-
-\textbf{Key advantages:}
-\begin{itemize}
-    \item \textbf{Informed proposals:} trajectories follow the gradient of
-          $\log \tilde{\pi}(q)$, not a random walk.
-    \item \textbf{Long-distance moves:} leapfrog integration produces
+  
+  \textbf{Key advantages:}
+  \begin{itemize}
+    \item \textbf{Informed, gradient-driven proposals:} by following the
+          geometry of $\log \tilde{\pi}(q)$, HMC avoids random walks and
+          therefore scales much better to high-dimensional spaces
+    \item \textbf{Statistical Independence:} leapfrog integration produces
           coherent paths through the parameter space.
     \item \textbf{High acceptance rates:} energy is almost conserved,
           so Metropolis rejections are rare.
     \item \textbf{Low autocorrelation:} successive samples are less dependent,
           improving effective sample size.
-    \item \textbf{Scales better with dimension:} less sensitivity to the curse
-          of dimensionality than random-walk MH
-\end{itemize}
-
-\vspace{0.2cm}
-
-\textbf{Result:} HMC explores complex posteriors much more efficiently
-than standard Metropolis-Hastings.
+  \end{itemize}
+  
+  \vspace{0.2cm}
+  
+  \textbf{Result:} HMC explores complex posteriors much more efficiently
+  than standard Metropolis-Hastings.
 \end{frame}
 
 
+
 \section{Experiments}
-\subsection{Subsection A}
-\subsection{Subsection B}
-\subsection{Subsection C}
+
+
+\subsection{Sampling from Gaussian Mixtures}
+
+\begin{frame}{MMD$^2$ Comparison}
+  
+  % --- TOP ROW ---
+  \begin{columns}[T]
+    
+    % LEFT: Plot
+    \begin{column}{0.50\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{../images/mmd2-comparison-better.png}
+    \end{column}
+    
+    % RIGHT: First two bullet points
+    \begin{column}{0.43\textwidth}
+      \textbf{Key observations:}
+      \begin{itemize}
+        \item \textbf{HMC converges quickly:} near-zero MMD$^2$ after $\sim$100 samples.
+        \item \textbf{MH converges slowly:} needs several hundred samples.
+      \end{itemize}
+    \end{column}
+    
+  \end{columns}
+  
+  \vspace{0.25cm}
+  
+  % --- BOTTOM FULL-WIDTH ROW ---
+  \begin{minipage}{0.95\textwidth}
+    \begin{itemize}
+      \item \textbf{Practical implication:} in many applications, the goal is to
+            obtain plausible samples rather than to perfectly reconstruct the 
+            full target distribution.
+      \item \textbf{Result:} HMC produces high-quality samples with far fewer
+            iterations, making it a better choice than standard 
+            Metropolis-Hastings.
+    \end{itemize}
+  \end{minipage}
+  
+\end{frame}
+
+
+\subsection{Sampling from Neal's Funnel}
+
 % ================================================
 
 
