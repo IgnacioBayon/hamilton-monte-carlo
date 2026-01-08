@@ -235,4 +235,3 @@ build/
 latex.out/
 
 # Ignore PDF file
-*.pdf
